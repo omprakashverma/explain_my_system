@@ -1,0 +1,233 @@
+{
+  "rootFolder": "/home/omprakash/PI30/explain_my_system",
+  "analyzedAt": "2026-04-20T09:18:33.669Z",
+  "rootStructure": [
+    {
+      "name": "README.md",
+      "type": "file",
+      "size": 938,
+      "lines": 41
+    },
+    {
+      "name": "README_DEMO.md",
+      "type": "file",
+      "size": 284,
+      "lines": 18
+    },
+    {
+      "name": "__pycache__",
+      "type": "dir"
+    },
+    {
+      "name": "frontend",
+      "type": "dir"
+    },
+    {
+      "name": "main.py",
+      "type": "file",
+      "size": 8245,
+      "lines": 400
+    },
+    {
+      "name": "requirements.txt",
+      "type": "file",
+      "size": 115,
+      "lines": 12
+    },
+    {
+      "name": "sample",
+      "type": "dir"
+    }
+  ],
+  "rootFileSnippets": {
+    "README.md": [
+      "Explain My System — POC",
+      "",
+      "Quick start",
+      "",
+      "1. Create and activate a Python venv",
+      "",
+      "python -m venv .venv",
+      "source .venv/bin/activate",
+      "",
+      "2. Install dependencies"
+    ],
+    "README_DEMO.md": [
+      "Run the POC demo",
+      "",
+      "Backend",
+      "",
+      "python -m venv .venv",
+      "source .venv/bin/activate",
+      "pip install -r requirements.txt",
+      "uvicorn main:app --reload --port 8002",
+      "",
+      "Frontend"
+    ],
+    "main.py": [
+      "import os",
+      "import zipfile",
+      "import io",
+      "import tempfile",
+      "import shutil",
+      "import subprocess",
+      "from pathlib import Path",
+      "from typing import List, Dict, Any",
+      "",
+      "import requests"
+    ],
+    "requirements.txt": [
+      "fastapi",
+      "uvicorn[standard]",
+      "python-multipart",
+      "requests",
+      "tqdm",
+      "pydantic",
+      "scikit-learn",
+      "numpy",
+      "aiofiles",
+      "openai"
+    ]
+  },
+  "importantFolders": [
+    {
+      "path": "frontend",
+      "category": "frontend",
+      "fileCount": 6,
+      "primaryLanguage": "JavaScript"
+    }
+  ],
+  "readmeParagraphs": {
+    "root": "Explain My System — POC"
+  },
+  "totals": {
+    "numFiles": 11,
+    "numDirs": 6,
+    "totalSizeBytes": 89825,
+    "totalLinesOfCode": 834
+  },
+  "fileCategories": {
+    "documentation": 3,
+    "other": 2,
+    "config": 2,
+    "source": 4
+  },
+  "linesOfCodePerLanguage": {
+    "JavaScript": 419,
+    "Python": 415
+  },
+  "filesPerLanguage": {
+    "JavaScript": 2,
+    "Python": 2
+  },
+  "projectTypes": [
+    "JavaScript/Node.js",
+    "Python (requirements)"
+  ],
+  "frameworks": [
+    "React",
+    "Flask"
+  ],
+  "entryPoints": [
+    "sample/sample_app.py"
+  ],
+  "ciCdTools": [],
+  "packageManagers": [
+    "pip"
+  ],
+  "topLevelDirectories": [
+    {
+      "name": "frontend",
+      "numFiles": 6,
+      "totalLoc": 419,
+      "dominantLanguage": "JavaScript"
+    },
+    {
+      "name": "sample",
+      "numFiles": 1,
+      "totalLoc": 15,
+      "dominantLanguage": "Python"
+    }
+  ],
+  "detailedDirectories": [
+    {
+      "path": "frontend",
+      "name": "frontend",
+      "level": 1,
+      "numFiles": 6,
+      "totalLoc": 419,
+      "dominantLanguage": "JavaScript",
+      "category": "Web/UI",
+      "description": "Web/UI module with 6 files (JavaScript)",
+      "subdirectories": [
+        {
+          "path": "frontend/src",
+          "name": "src",
+          "level": 2,
+          "numFiles": 3,
+          "totalLoc": 419,
+          "dominantLanguage": "JavaScript",
+          "category": "General",
+          "description": "General module with 3 files (JavaScript)",
+          "subdirectories": []
+        }
+      ]
+    },
+    {
+      "path": "sample",
+      "name": "sample",
+      "level": 1,
+      "numFiles": 1,
+      "totalLoc": 15,
+      "dominantLanguage": "Python",
+      "category": "General",
+      "description": "General module with 1 files (Python)",
+      "subdirectories": []
+    }
+  ],
+  "architecturalInsights": {
+    "coreApplications": [],
+    "entryPointDetails": [
+      {
+        "path": "../../sample/sample_app.py",
+        "type": "Unknown",
+        "description": ""
+      }
+    ],
+    "serviceArchitecture": {
+      "microservices": [],
+      "monoliths": [],
+      "libraries": []
+    },
+    "layeredArchitecture": {
+      "presentation": [],
+      "business": [],
+      "data": [],
+      "infrastructure": []
+    }
+  },
+  "largeFiles": [],
+  "dependencies": {
+    "production": [
+      "fastapi",
+      "uvicorn[standard]",
+      "python-multipart",
+      "requests",
+      "tqdm",
+      "pydantic",
+      "scikit-learn",
+      "numpy",
+      "aiofiles",
+      "openai",
+      "python-dotenv"
+    ],
+    "development": [],
+    "total": 11
+  },
+  "complexity": {
+    "averageFileSize": 75.81818181818181,
+    "maxFileSize": 0,
+    "nestedDepth": 0,
+    "estimatedComplexity": "low"
+  }
+}

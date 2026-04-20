@@ -1,0 +1,27 @@
+:root{
+	--bg:#0f1724;
+	--card:#0b1220;
+	--muted:#94a3b8;
+	--accent:#10b981;
+}
+html,body,#root{height:100%}
+body{background:linear-gradient(180deg,#071026 0%, #0b1220 100%);color:#e6eef8;font-family:Inter,system-ui,Arial;margin:0}
+.ems-root{max-width:1300px;margin:18px auto;padding:12px}
+.ems-header h1{margin:0 0 6px;font-size:20px}
+.ems-actions{display:flex;gap:8px;align-items:center}
+.git-input{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--muted)}
+.ems-body{display:grid;grid-template-columns:300px 1fr 420px;gap:16px;height:calc(100vh - 120px)}
+.ems-sidebar{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;height:100%;overflow:auto}
+.ems-main{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:16px;border-radius:10px;height:100%;overflow:auto}
+.ems-preview{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;height:100%;overflow:auto}
+.ems-files{display:flex;flex-direction:column;gap:6px}
+.ems-file{padding:8px;border-radius:6px;cursor:pointer}
+.ems-file:hover{background:rgba(255,255,255,0.02)}
+.file-preview{white-space:pre-wrap}
+.muted{color:var(--muted)}
+.ems-ask textarea{width:100%;height:84px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
+.ems-controls{display:flex;align-items:center;gap:12px;margin-top:8px}
+.ems-answer{min-height:120px}
+.btn{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+.btn.outline{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+.btn.danger{background:#ef4444}
