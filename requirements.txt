@@ -9,3 +9,5 @@ numpy
 aiofiles
 openai
 python-dotenv
+PyYAML
+openapi-spec-validator

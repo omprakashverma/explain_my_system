@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: Sample Store API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+  /api/users/{user_id}:
+    get:
+      summary: Get a user by id
+      operationId: getUser
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/orders:
+    get:
+      summary: List orders
+      operationId: listOrders
+      responses:
+        "200":
+          description: Current orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      summary: Create an order
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - user_id
+        - name
+      properties:
+        user_id:
+          type: integer
+        name:
+          type: string
+    OrderInput:
+      type: object
+      required:
+        - sku
+        - quantity
+      properties:
+        sku:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+    Order:
+      allOf:
+        - $ref: "#/components/schemas/OrderInput"
+        - type: object
+          required:
+            - order_id
+            - status
+          properties:
+            order_id:
+              type: string
+            status:
+              type: string
