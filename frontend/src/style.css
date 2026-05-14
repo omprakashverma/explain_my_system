@@ -50,6 +50,27 @@ button:disabled {
   padding: 20px;
 }
 
+.loading-overlay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+}
+
+.loading-overlay-card {
+  min-width: 240px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(72, 213, 195, 0.22);
+  background: rgba(6, 19, 31, 0.94);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.loading-overlay-card strong {
+  display: block;
+}
+
 .hero-card,
 .panel {
   background: var(--panel);
