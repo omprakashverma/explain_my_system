@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV=/home/omprakash/PI25/house_price_predict/explain_my_system/.venv
+VIRTUAL_ENV=/home/omprakash/PI30/explain_my_system/.venv
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
