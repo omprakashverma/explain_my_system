@@ -15,6 +15,7 @@ class RepositoryStore:
     files: Dict[str, str] = field(default_factory=dict)
     chunks: List[Dict[str, Any]] = field(default_factory=list)
     file_questions: Dict[str, List[Dict[str, Any]]] = field(default_factory=dict)
+    repository_tree: List[str] = field(default_factory=list)
     repository_meta: Dict[str, Any] = field(
         default_factory=lambda: {
             "source_type": None,
@@ -28,20 +29,30 @@ class RepositoryStore:
         lines = text.splitlines()
         chunks: List[Dict[str, str]] = []
         current: List[str] = []
+        start_line = 1
         for line in lines:
             current.append(line)
             if len("\n".join(current)) > 2000:
-                chunks.append({"path": path, "text": "\n".join(current)})
+                chunks.append({"path": path, "text": "\n".join(current), "start_line": start_line})
+                start_line += len(current)
                 current = []
         if current:
-            chunks.append({"path": path, "text": "\n".join(current)})
+            chunks.append({"path": path, "text": "\n".join(current), "start_line": start_line})
         return chunks
 
     def reload_chunks(self) -> None:
         self.chunks.clear()
         for path, text in self.files.items():
             for idx, chunk in enumerate(self.chunk_text(text, path)):
-                self.chunks.append({"path": path, "idx": idx, "text": chunk["text"]})
+                self.chunks.append(
+                    {
+                        "path": path,
+                        "idx": idx,
+                        "text": chunk["text"],
+                        "start_line": chunk["start_line"],
+                    }
+                )
+        self.repository_tree = sorted(self.files.keys())
 
     def retrieve_similar(self, question: str, top_k: int = 5) -> List[Dict[str, Any]]:
         if not self.chunks:
@@ -72,6 +83,29 @@ class RepositoryStore:
         context_chunks = self.retrieve_similar(prompt)
         return "\n---\n".join(f"FILE: {chunk['path']}\n{chunk['text'][:1500]}" for chunk in context_chunks)
 
+    def build_repository_context(self, prompt: str, top_k: int = 8) -> str:
+        summary = self.get_summary_payload()
+        tree_preview = "\n".join(self.repository_tree[:80])
+        relevant_chunks = self.retrieve_similar(prompt, top_k=top_k)
+        chunk_preview = "\n---\n".join(
+            (
+                f"FILE: {chunk['path']}\n"
+                f"START LINE: {chunk.get('start_line', 1)}\n"
+                f"{chunk['text'][:1600]}"
+            )
+            for chunk in relevant_chunks
+        )
+        return (
+            "REPOSITORY SUMMARY:\n"
+            f"{summary.get('overview', 'No summary available.')}\n\n"
+            "TOP MODULES:\n"
+            f"{', '.join(summary.get('top_modules', [])) or 'None'}\n\n"
+            "REPOSITORY TREE (TRUNCATED):\n"
+            f"{tree_preview or 'No files loaded.'}\n\n"
+            "RELEVANT FILE CHUNKS:\n"
+            f"{chunk_preview or 'No relevant chunks available.'}"
+        )
+
     def update_summary(self, source_type: str, source_label: str) -> None:
         loaded_at = utc_timestamp()
         self.repository_meta.update(
@@ -93,6 +127,7 @@ class RepositoryStore:
         self.files.clear()
         self.files.update(dict(sorted(files.items())))
         self.file_questions.clear()
+        self.repository_tree.clear()
         self.reload_chunks()
         self.update_summary(source_type, source_label)
         return {
@@ -105,8 +140,10 @@ class RepositoryStore:
     def get_summary_payload(self) -> Dict[str, Any]:
         return self.summary_state if self.summary_state else dict(DEFAULT_SUMMARY_STATE)
 
-    def get_file_questions(self, path: str) -> List[Dict[str, Any]]:
-        return self.file_questions.get(normalize_path(path), [])
+    def get_repository_key(self) -> str:
+        source_type = self.repository_meta.get("source_type") or "none"
+        source_label = self.repository_meta.get("source_label") or "none"
+        return f"{source_type}:{source_label}"
 
     def add_file_question(self, path: str, username: str, question: str) -> Dict[str, Any]:
         normalized = ensure_file_exists(self.files, path)
@@ -127,6 +164,7 @@ class RepositoryStore:
         self.files.clear()
         self.chunks.clear()
         self.file_questions.clear()
+        self.repository_tree.clear()
         self.repository_meta.update(
             {
                 "source_type": None,

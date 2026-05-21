@@ -4,18 +4,24 @@ import { Header } from '../../components/layout/Header';
 import { NotesPanel } from '../../components/notes/NotesPanel';
 import { FilePreview } from '../../components/preview/FilePreview';
 import { AskPanel } from '../../components/qa/AskPanel';
+import { PromptTemplateSelector } from '../../components/qa/PromptTemplateSelector';
 import { FileExplorer } from '../../components/repository/FileExplorer';
 import { RepositoryLoader } from '../../components/repository/RepositoryLoader';
 import { StatusBanner } from '../../components/status/StatusBanner';
 import { useAppContext } from '../../context/AppContext';
 
 export function DashboardPage() {
-  const { ai, notes, preview, repository } = useAppContext();
+  const { ai, auth, notes, preview, repository } = useAppContext();
 
   return (
     <div className="ems-root">
       <LoadingOverlay message={repository.busyMessage} />
-      <Header summary={repository.summary} busyMessage={repository.busyMessage} />
+      <Header
+        summary={repository.summary}
+        busyMessage={repository.busyMessage}
+        onLogout={auth.logout}
+        user={auth.user}
+      />
 
       <section className="control-grid">
         <RepositoryLoader
@@ -104,23 +110,42 @@ export function DashboardPage() {
         />
 
         <main className="ems-main">
+          <PromptTemplateSelector
+            isBusy={ai.answerLoading}
+            onApplyTemplate={ai.applyTemplate}
+            onRunTemplate={ai.runTemplate}
+            selectedTemplateId={ai.selectedTemplateId}
+            templates={ai.templates}
+          />
+
           <AskPanel
             answer={ai.answer}
             answerLoading={ai.answerLoading}
-            onAsk={() => ai.askQuestion(preview.selectedFile)}
+            askScope={ai.askScope}
+            onAsk={ai.askQuestion}
             onQuestionChange={ai.setQuestion}
+            onScopeChange={ai.setAskScope}
             question={ai.question}
+            selectedFile={preview.selectedFile}
           />
 
           <NotesPanel
+            currentUser={auth.user}
+            discussionFilter={notes.discussionFilter}
             fileQuestion={notes.fileQuestion}
             isBusy={repository.isBusy}
+            onDiscussionFilterChange={notes.setDiscussionFilter}
             onFileQuestionChange={notes.setFileQuestion}
+            onQuestionScopeChange={notes.setQuestionScope}
+            onReplyChange={notes.updateReplyDraft}
+            onResolveToggle={notes.toggleResolved}
             onSaveQuestion={notes.tagQuestionToFile}
-            onUsernameChange={notes.setUsername}
+            onSubmitReply={notes.submitReply}
+            questionScope={notes.questionScope}
+            replyDrafts={notes.replyDrafts}
             selectedFile={preview.selectedFile}
             taggedQuestions={preview.taggedQuestions}
-            username={notes.username}
+            username={auth.user?.username || ''}
           />
         </main>
       </div>

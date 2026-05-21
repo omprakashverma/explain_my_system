@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from fastapi import HTTPException
 
-from backend.app.core.constants import IGNORED_PATH_PARTS
+from backend.app.core.constants import IGNORED_FILE_NAMES, IGNORED_PATH_PARTS
 
 
 def normalize_path(path: str) -> str:
@@ -14,7 +14,9 @@ def normalize_path(path: str) -> str:
 def should_skip_path(path: str) -> bool:
     normalized = normalize_path(path)
     parts = [part for part in normalized.split("/") if part]
-    return any(part in IGNORED_PATH_PARTS for part in parts)
+    if any(part in IGNORED_PATH_PARTS for part in parts):
+        return True
+    return Path(normalized).name in IGNORED_FILE_NAMES
 
 
 def detect_language(file_path: str) -> str:
@@ -25,6 +27,17 @@ def detect_language(file_path: str) -> str:
         ".ts": "TypeScript",
         ".tsx": "TypeScript React",
         ".jsx": "JavaScript React",
+        ".java": "Java",
+        ".go": "Go",
+        ".md": "Markdown",
+        ".json": "JSON",
+        ".yaml": "YAML",
+        ".yml": "YAML",
+        ".toml": "TOML",
+        ".ini": "Config",
+        ".cfg": "Config",
+        ".env": "Config",
+        ".sh": "Shell",
     }.get(suffix, "Unknown")
 
 

@@ -3,6 +3,43 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 
 
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: Optional[str]
+    role: str
+    created_at: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserResponse
+
+
+class ReplyResponse(BaseModel):
+    id: int
+    question_id: int
+    user_id: int
+    username: str
+    content: str
+    created_at: str
+
+
+class QuestionResponse(BaseModel):
+    id: int
+    path: Optional[str]
+    scope: str
+    user_id: int
+    username: str
+    question: str
+    resolved: bool
+    resolved_at: Optional[str]
+    created_at: str
+    reply_count: int
+    latest_reply_at: Optional[str]
+    replies: List[ReplyResponse]
+
+
 class FileListResponse(BaseModel):
     files: List[str]
 
@@ -16,7 +53,7 @@ class FileResponse(BaseModel):
     path: str
     text: str
     chunks: List[Dict[str, Any]]
-    questions: List[Dict[str, Any]]
+    questions: List[QuestionResponse]
 
 
 class SummaryResponse(BaseModel):
@@ -46,14 +83,53 @@ class RepoSummaryResponse(BaseModel):
 
 class TagQuestionResponse(BaseModel):
     success: bool
-    file: str
+    file: Optional[str]
     total_tags: int
+    question: QuestionResponse
+
+
+class ReplyMutationResponse(BaseModel):
+    success: bool
+    reply: ReplyResponse
+    reply_count: int
+
+
+class RepliesResponse(BaseModel):
+    replies: List[ReplyResponse]
+
+
+class QuestionMutationResponse(BaseModel):
+    success: bool
+    question: QuestionResponse
+
+
+class QuestionsListResponse(BaseModel):
+    questions: List[QuestionResponse]
+
+
+class PromptTemplateResponse(BaseModel):
+    id: str
+    title: str
+    category: str
+    description: str
+    prompt_template: str
+    output_format: str
+    scope: str
+
+
+class PromptTemplateListResponse(BaseModel):
+    templates: List[PromptTemplateResponse]
 
 
 class AskResponse(BaseModel):
     answer: str
     found: int
     selected_file: Optional[str]
+
+
+class PromptTemplateRunResponse(AskResponse):
+    template: PromptTemplateResponse
+    scope: str
 
 
 class ClearResponse(BaseModel):

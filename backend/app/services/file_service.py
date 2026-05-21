@@ -1,3 +1,4 @@
+from backend.app.services.note_service import note_service
 from backend.app.storage.repository_store import repository_store
 from backend.app.utils.text_utils import ensure_file_exists, normalize_path
 
@@ -12,7 +13,7 @@ class FileService:
             "path": normalized,
             "text": repository_store.files[normalized],
             "chunks": related_chunks[:5],
-            "questions": repository_store.get_file_questions(normalized),
+            "questions": note_service.list_questions(repository_store.get_repository_key(), normalized),
         }
 
 

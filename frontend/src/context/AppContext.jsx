@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import { useAuthContext } from './AuthContext';
 import { useAskAI } from '../hooks/useAskAI';
 import { useFilePreview } from '../hooks/useFilePreview';
 import { useNotes } from '../hooks/useNotes';
@@ -7,14 +8,19 @@ import { useRepository } from '../hooks/useRepository';
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
+  const auth = useAuthContext();
   const repository = useRepository();
   const preview = useFilePreview(repository.setAppError);
-  const ai = useAskAI(repository.setAppError);
+  const ai = useAskAI(repository.setAppError, preview.selectedFile);
   const notes = useNotes(
     async (message, task) => repository.runWithBusy(message, task),
     preview.openFile,
-    () => preview.selectedFile,
-    () => preview.highlightedLine
+    preview.selectedFile,
+    () => preview.highlightedLine,
+    () => auth.user?.username || '',
+    repository.setAppError,
+    preview.setTaggedQuestions,
+    repository.summary?.loaded_at || repository.summary?.source_label || ''
   );
 
   useEffect(() => {
@@ -26,9 +32,10 @@ export function AppProvider({ children }) {
       repository,
       preview,
       ai,
-      notes
+      notes,
+      auth
     }),
-    [ai, notes, preview, repository]
+    [ai, auth, notes, preview, repository]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

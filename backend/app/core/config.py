@@ -20,6 +20,8 @@ class Settings(BaseModel):
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
+    auth_db_path: str = str(BASE_DIR / "backend" / "app" / "storage" / "auth.db")
+    auth_session_days: int = 7
 
 
 @lru_cache(maxsize=1)
@@ -30,4 +32,6 @@ def get_settings() -> Settings:
         llm_api_url=os.getenv("LLM_API_URL", Settings().llm_api_url),
         llm_api_key=os.getenv("LLM_API_KEY", Settings().llm_api_key).strip(),
         llm_model=os.getenv("LLM_MODEL", Settings().llm_model),
+        auth_db_path=os.getenv("AUTH_DB_PATH", Settings().auth_db_path),
+        auth_session_days=int(os.getenv("AUTH_SESSION_DAYS", str(Settings().auth_session_days))),
     )

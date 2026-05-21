@@ -1,12 +1,20 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from backend.app.api.dependencies import require_current_user
 from backend.app.agents.qa_agent import qa_agent
-from backend.app.models.request_models import AskRequest
-from backend.app.models.response_models import AskResponse, RepoSummaryResponse
+from backend.app.models.request_models import AskRequest, PromptTemplateRunRequest, QuestionScope
+from backend.app.models.response_models import (
+    AskResponse,
+    PromptTemplateListResponse,
+    PromptTemplateRunResponse,
+    RepoSummaryResponse,
+)
 from backend.app.services.ai_service import ai_service
+from backend.app.services.prompt_template_service import prompt_template_service
 from backend.app.storage.repository_store import repository_store
+from backend.app.utils.text_utils import ensure_file_exists
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_current_user)])
 
 
 @router.get("/repo-summary", response_model=RepoSummaryResponse)
@@ -33,9 +41,30 @@ async def ask(req: AskRequest) -> dict[str, object]:
         raise HTTPException(400, "Load a repository before asking questions.")
     if not req.prompt.strip():
         raise HTTPException(400, "Prompt cannot be empty.")
-    answer = qa_agent.answer(repository_store, req.prompt, req.selected_file)
+    scope = (req.scope or QuestionScope.FILE).upper()
+    if scope not in {QuestionScope.FILE, QuestionScope.REPOSITORY}:
+        raise HTTPException(400, "Unsupported scope value.")
+    selected_file = req.selected_file
+    if scope == QuestionScope.FILE:
+        if not selected_file:
+            raise HTTPException(400, "Select a file or switch to repository scope before asking.")
+        selected_file = ensure_file_exists(repository_store.files, selected_file)
+    else:
+        selected_file = None
+    answer = qa_agent.answer(repository_store, req.prompt, selected_file, scope)
+    found = 1 if scope == QuestionScope.FILE and selected_file else len(repository_store.retrieve_similar(req.prompt))
     return {
         "answer": answer,
-        "found": 1 if req.selected_file else len(repository_store.retrieve_similar(req.prompt)),
-        "selected_file": req.selected_file,
+        "found": found,
+        "selected_file": selected_file,
     }
+
+
+@router.get("/prompt-templates", response_model=PromptTemplateListResponse)
+async def list_prompt_templates() -> dict[str, object]:
+    return {"templates": prompt_template_service.list_templates()}
+
+
+@router.post("/prompt-templates/run", response_model=PromptTemplateRunResponse)
+async def run_prompt_template(req: PromptTemplateRunRequest) -> dict[str, object]:
+    return prompt_template_service.run_template(req.template_id)

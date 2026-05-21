@@ -5,7 +5,7 @@ from typing import Dict
 
 from fastapi import HTTPException
 
-from backend.app.core.constants import SUPPORTED_CODE_SUFFIXES
+from backend.app.core.constants import MAX_FILE_CHARS, SUPPORTED_CODE_SUFFIXES
 from backend.app.utils.text_utils import normalize_path, should_skip_path
 
 
@@ -20,7 +20,10 @@ def read_code_files_from_directory(directory: Path) -> Dict[str, str]:
         if file_path.suffix.lower() not in SUPPORTED_CODE_SUFFIXES:
             continue
         try:
-            files[relative_path] = file_path.read_text(encoding="utf-8", errors="ignore")
+            text = file_path.read_text(encoding="utf-8", errors="ignore")
+            if len(text) > MAX_FILE_CHARS:
+                text = text[:MAX_FILE_CHARS]
+            files[relative_path] = text
         except Exception:
             continue
     return files
@@ -42,7 +45,10 @@ def read_code_files_from_zip(data: bytes) -> Dict[str, str]:
         if Path(normalized_name).suffix.lower() not in SUPPORTED_CODE_SUFFIXES:
             continue
         try:
-            files[normalized_name] = archive.read(name).decode("utf-8", errors="ignore")
+            text = archive.read(name).decode("utf-8", errors="ignore")
+            if len(text) > MAX_FILE_CHARS:
+                text = text[:MAX_FILE_CHARS]
+            files[normalized_name] = text
         except Exception:
             continue
     return files

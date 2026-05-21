@@ -45,6 +45,82 @@ button:disabled {
   opacity: 0.55;
 }
 
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(1100px, 100%);
+  display: grid;
+  grid-template-columns: minmax(320px, 1.2fr) minmax(320px, 0.95fr);
+  gap: 24px;
+  padding: 28px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.auth-copy,
+.auth-panel {
+  min-width: 0;
+}
+
+.auth-panel {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(157, 182, 198, 0.14);
+  background: rgba(4, 18, 29, 0.68);
+}
+
+.auth-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  margin-bottom: 18px;
+}
+
+.auth-tab {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 700;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.auth-tab.active {
+  color: var(--text);
+  background: rgba(72, 213, 195, 0.14);
+}
+
+.auth-form,
+.auth-field {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-field span {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.auth-footnote {
+  margin: 18px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .ems-root {
   margin: 0 auto;
   padding: 20px;
@@ -87,6 +163,14 @@ button:disabled {
   gap: 24px;
   padding: 28px;
   margin-bottom: 22px;
+}
+
+.hero-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .hero-kicker,
@@ -209,7 +293,8 @@ button:disabled {
 
 .button-row,
 .chip-row,
-.git-row {
+.git-row,
+.auth-badge-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -227,9 +312,34 @@ button:disabled {
   align-items: stretch;
 }
 
+.scope-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.scope-chip {
+  border: 1px solid rgba(157, 182, 198, 0.2);
+  border-radius: 999px;
+  padding: 9px 14px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.scope-chip.active {
+  color: var(--text);
+  border-color: rgba(72, 213, 195, 0.3);
+  background: rgba(72, 213, 195, 0.12);
+}
+
 .text-input,
 .text-area,
-.git-row .text-input {
+.git-row .text-input,
+.template-select {
   width: 100%;
   border: 1px solid rgba(157, 182, 198, 0.2);
   background: rgba(4, 18, 29, 0.72);
@@ -241,7 +351,8 @@ button:disabled {
 }
 
 .text-input:focus,
-.text-area:focus {
+.text-area:focus,
+.template-select:focus {
   border-color: rgba(72, 213, 195, 0.48);
   transform: translateY(-1px);
 }
@@ -250,6 +361,11 @@ button:disabled {
   min-height: 112px;
   resize: vertical;
   margin-bottom: 16px;
+}
+
+.text-area.compact {
+  min-height: 84px;
+  margin-bottom: 10px;
 }
 
 .git-row .text-input {
@@ -505,6 +621,246 @@ button:disabled {
   padding: 18px;
   min-height: 140px;
   overflow: auto;
+}
+
+.answer-box-compact {
+  min-height: 0;
+}
+
+.answer-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.answer-text-card,
+.mermaid-card {
+  border-radius: 24px;
+  border: 1px solid rgba(157, 182, 198, 0.14);
+  background: var(--panel-strong);
+  overflow: hidden;
+}
+
+.mermaid-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 0;
+}
+
+.mermaid-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mermaid-card-header h3,
+.answer-text-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.mermaid-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mermaid-status.loading {
+  background: rgba(244, 184, 96, 0.16);
+  color: #ffe5ba;
+}
+
+.mermaid-status.ready {
+  background: rgba(117, 211, 129, 0.16);
+  color: #dff5e3;
+}
+
+.mermaid-status.error {
+  background: rgba(255, 125, 111, 0.16);
+  color: #ffd6d0;
+}
+
+.mermaid-stage {
+  padding: 18px;
+}
+
+.mermaid-stage.fullscreen {
+  padding: 22px 26px 26px;
+  min-height: 0;
+}
+
+.mermaid-output {
+  display: none;
+  overflow: auto;
+  border-radius: 20px;
+  border: 1px solid rgba(157, 182, 198, 0.12);
+  background:
+    radial-gradient(circle at top left, rgba(72, 213, 195, 0.09), transparent 30%),
+    linear-gradient(180deg, rgba(16, 37, 54, 0.98), rgba(8, 25, 38, 0.98));
+  padding: 16px;
+}
+
+.mermaid-output.is-visible {
+  display: block;
+}
+
+.mermaid-output.fullscreen {
+  min-height: 78vh;
+  max-height: none;
+}
+
+.mermaid-output svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 620px;
+}
+
+.mermaid-output svg text,
+.mermaid-output svg tspan,
+.mermaid-output svg .edgeLabel,
+.mermaid-output svg .messageText,
+.mermaid-output svg .labelText,
+.mermaid-output svg .loopText,
+.mermaid-output svg .noteText,
+.mermaid-output svg .cluster-label text {
+  fill: #f3fbff !important;
+  color: #f3fbff !important;
+  stroke: none !important;
+  opacity: 1 !important;
+}
+
+.mermaid-output svg .nodeLabel,
+.mermaid-output svg .nodeLabel text,
+.mermaid-output svg .nodeLabel tspan,
+.mermaid-output svg .node .label,
+.mermaid-output svg .node .label text,
+.mermaid-output svg .node .label tspan {
+  fill: #0a1a26 !important;
+  color: #0a1a26 !important;
+  stroke: none !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.mermaid-output svg .label foreignObject,
+.mermaid-output svg .edgeLabel foreignObject {
+  color: #f3fbff !important;
+}
+
+.mermaid-output svg .label foreignObject div,
+.mermaid-output svg .label foreignObject span,
+.mermaid-output svg .edgeLabel foreignObject div,
+.mermaid-output svg .edgeLabel foreignObject span,
+.mermaid-output svg .nodeLabel p,
+.mermaid-output svg .nodeLabel span,
+.mermaid-output svg .nodeLabel div {
+  color: #0a1a26 !important;
+  fill: #0a1a26 !important;
+  background: transparent !important;
+  font-weight: 700 !important;
+}
+
+.mermaid-output svg .edgeLabel,
+.mermaid-output svg .edgeLabel text,
+.mermaid-output svg .edgeLabel tspan,
+.mermaid-output svg .edgeLabel foreignObject,
+.mermaid-output svg .edgeLabel foreignObject div,
+.mermaid-output svg .edgeLabel foreignObject span {
+  fill: #f3fbff !important;
+  color: #f3fbff !important;
+}
+
+.mermaid-output svg .node rect,
+.mermaid-output svg .node polygon,
+.mermaid-output svg .node circle,
+.mermaid-output svg .node ellipse,
+.mermaid-output svg .node path,
+.mermaid-output svg .label-container,
+.mermaid-output svg .cluster rect {
+  fill: #f4ebc8 !important;
+  stroke: #d4c083 !important;
+}
+
+.mermaid-output svg .edgeLabel rect,
+.mermaid-output svg .labelBkg {
+  fill: #0c2232 !important;
+  opacity: 0.95 !important;
+}
+
+.mermaid-output.fullscreen svg {
+  min-width: 1500px;
+}
+
+.mermaid-expand-btn {
+  min-width: 118px;
+}
+
+.mermaid-fallback {
+  display: grid;
+  gap: 12px;
+}
+
+.mermaid-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(1, 10, 16, 0.82);
+  backdrop-filter: blur(14px);
+}
+
+.mermaid-modal {
+  width: min(1380px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px;
+  border: 1px solid rgba(157, 182, 198, 0.18);
+  background: linear-gradient(180deg, rgba(8, 24, 38, 0.98), rgba(4, 18, 29, 0.98));
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.42);
+  overflow: hidden;
+}
+
+.mermaid-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(8, 24, 38, 0.98), rgba(8, 24, 38, 0.92));
+  backdrop-filter: blur(10px);
+}
+
+.mermaid-modal-body {
+  overflow: auto;
+  max-height: calc(100vh - 124px);
+  padding-bottom: 12px;
+}
+
+.answer-text-card .panel-heading {
+  padding: 18px 18px 0;
+}
+
+.answer-text-card .answer-box {
+  border: none;
+  border-top: 1px solid rgba(157, 182, 198, 0.1);
+  border-radius: 0 0 24px 24px;
 }
 
 .preview-empty {
@@ -810,7 +1166,79 @@ button:disabled {
   color: var(--muted);
 }
 
+.discussion-card {
+  display: grid;
+  gap: 14px;
+}
+
+.discussion-card.resolved {
+  border-color: rgba(117, 211, 129, 0.28);
+  background: rgba(117, 211, 129, 0.06);
+}
+
+.notes-toolbar {
+  gap: 14px;
+}
+
+.discussion-header,
+.reply-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.discussion-author {
+  margin: 10px 0 4px;
+  font-size: 1rem;
+}
+
+.discussion-question {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.reply-list,
+.reply-composer {
+  display: grid;
+  gap: 12px;
+}
+
+.reply-card {
+  border: 1px solid rgba(157, 182, 198, 0.14);
+  border-radius: 16px;
+  background: rgba(4, 18, 29, 0.48);
+  padding: 14px;
+}
+
+.reply-card p {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.ask-hint {
+  margin-top: 10px;
+}
+
+.template-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 182, 198, 0.14);
+  background: rgba(4, 18, 29, 0.46);
+}
+
+.template-description {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 @media (max-width: 1220px) {
+  .auth-card,
   .hero-card,
   .control-grid,
   .ems-body,
@@ -826,6 +1254,10 @@ button:disabled {
 
   .file-preview {
     max-height: 520px;
+  }
+
+  .mermaid-output svg {
+    min-width: 520px;
   }
 
   .diff-header,
@@ -856,6 +1288,29 @@ button:disabled {
 
   .preview-meta {
     width: 100%;
+  }
+
+  .mermaid-card-header {
+    flex-direction: column;
+  }
+
+  .mermaid-toolbar,
+  .mermaid-modal-header {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mermaid-modal-backdrop {
+    padding: 12px;
+  }
+
+  .mermaid-modal {
+    max-height: calc(100vh - 24px);
+  }
+
+  .mermaid-output svg {
+    min-width: 420px;
   }
 
   .file-preview,

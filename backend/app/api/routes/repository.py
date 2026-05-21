@@ -1,10 +1,11 @@
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
+from backend.app.api.dependencies import require_current_user
 from backend.app.core.constants import SAMPLE_DIR
 from backend.app.models.response_models import ClearResponse, FileListResponse, FilesFullResponse, StoreRepositoryResponse, SummaryResponse
 from backend.app.services.repository_service import repository_service
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_current_user)])
 
 
 @router.post("/upload-zip", response_model=StoreRepositoryResponse)

@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.api.router import api_router
 from backend.app.core.config import get_settings
 from backend.app.core.logging import configure_logging
+from backend.app.services.auth_service import auth_service
 
 configure_logging()
 settings = get_settings()
@@ -17,3 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api_router)
+
+
+@app.on_event("startup")
+async def startup() -> None:
+    auth_service.ensure_admin_user()

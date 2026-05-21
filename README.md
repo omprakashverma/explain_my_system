@@ -156,12 +156,18 @@ The UI is designed as a practical engineering workspace rather than a generic ch
 ### AI Q&A Workspace
 
 - Accepts repository questions
-- Uses selected file context when available
+- Supports both file-scoped and repository-scoped questions
+- Uses selected file context when file scope is active
+- Uses repository-wide retrieval when repository scope is active
+- Offers predefined AI prompt templates for common repository analyses
 - Returns AI answers or configuration feedback when no LLM is set
 
 ### Notes Workspace
 
 - Saves file-specific questions/notes
+- Supports repository-wide discussions and architecture questions
+- Supports threaded replies with author and timestamp metadata
+- Lets creators or admins mark questions resolved or reopen them
 - Supports collaborative context for code review and onboarding
 
 ---
@@ -312,7 +318,7 @@ pip install -r requirements.txt
 Run the API server:
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8002
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8002
 ```
 
 Backend default URL:
@@ -331,6 +337,8 @@ Create a `.env` file in the project root if you want to enable AI responses thro
 LLM_API_URL=https://api.groq.com/openai/v1/chat/completions
 LLM_API_KEY=your_api_key_here
 LLM_MODEL=meta-llama/llama-4-scout-17b-16e-instruct
+AUTH_DB_PATH=backend/app/storage/auth.db
+AUTH_SESSION_DAYS=7
 ```
 
 Frontend environment variables can be provided through Vite:
@@ -346,9 +354,76 @@ VITE_API_BASE=http://localhost:8002
 | `LLM_API_URL` | No | OpenAI-compatible chat completions endpoint |
 | `LLM_API_KEY` | No | API key for the configured LLM provider |
 | `LLM_MODEL` | No | Model identifier used by the backend AI service |
+| `AUTH_DB_PATH` | No | SQLite database file used for users and sessions |
+| `AUTH_SESSION_DAYS` | No | Number of days an authenticated session remains valid |
 | `VITE_API_BASE` | No | Frontend API base URL override |
 
 If `LLM_API_KEY` is not set, the AI endpoints still function structurally but return a helpful configuration message instead of a live model response.
+The same SQLite database file is also used for tagged questions, replies, and resolution state.
+
+---
+
+## Authentication Flow
+
+The application now requires authentication before repository features are available.
+
+### Registration Flow
+
+1. Open the frontend and switch to the `Register` tab.
+2. Enter a username, optional email, and password.
+3. Submit the form to create the account.
+4. The backend hashes the password with PBKDF2 before storing it in SQLite.
+5. After registration, the frontend stores the issued session token and opens the dashboard automatically.
+
+### Login / Logout Usage
+
+1. Use the `Login` tab with your username and password.
+2. After login, the current username appears in the dashboard header and is used automatically for file notes.
+3. Use the `Logout` button in the header to invalidate the current session and return to the auth screen.
+
+### Protected Backend Behavior
+
+- `GET /summary`, `GET /files`, `GET /file`, `POST /ask`, repository loading routes, and note creation now require a valid bearer token.
+- `GET /health`, `POST /auth/register`, `POST /auth/login`, and `GET /auth/me` remain available for auth/bootstrap flows.
+
+### Question Discussion Workflow
+
+1. Choose whether the question should target a file or the whole repository.
+2. Open a file and create a file-scoped tagged question, or stay in repository scope for a global discussion.
+3. Any logged-in user can reply to the question.
+4. The question author or an admin can mark it `Resolved` or switch it back to `Open`.
+5. Replies and resolution state are stored in SQLite and scoped to the loaded repository and file path when applicable.
+
+### Repository Question Workflow
+
+1. Switch the ask panel to `Ask Entire Repository`.
+2. The backend reuses the indexed repository snapshot, summary, file tree, and relevant chunks instead of rescanning the repo on every question.
+3. The LLM receives a repository-aware prompt with structure metadata and cross-file snippets.
+4. Repository discussions can be filtered separately from file discussions in the notes panel.
+
+### Predefined Prompt Templates
+
+The ask workspace now includes a prompt selector for common repository analyses such as:
+
+- architecture overview
+- API flow analysis
+- authentication flow review
+- frontend state and routing review
+- security risk review
+- code smell detection
+- Mermaid architecture and class diagrams
+
+Templates can either:
+
+- apply their generated prompt into the manual input box, or
+- run immediately against repository-wide context
+
+## Admin Credentials
+
+Username: admin
+Password: admin123
+
+The admin account is created automatically during backend startup if it does not already exist. The password is hashed before storage and is never hardcoded in the frontend source.
 
 ---
 
@@ -360,9 +435,44 @@ Base URL:
 http://localhost:8002
 ```
 
+### `POST /auth/register`
+
+Creates a new user and returns a session token.
+
+**Example request**
+
+```json
+{
+  "username": "alice",
+  "email": "alice@example.com",
+  "password": "strongpass123"
+}
+```
+
+### `POST /auth/login`
+
+Authenticates an existing user and returns a session token.
+
+**Example request**
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+### `POST /auth/logout`
+
+Invalidates the current bearer token.
+
+### `GET /auth/me`
+
+Returns the currently authenticated user.
+
 ### `GET /summary`
 
-Returns the current repository summary.
+Returns the current repository summary. Requires authentication.
 
 **Example response**
 
@@ -384,7 +494,7 @@ Returns the current repository summary.
 
 ### `GET /files`
 
-Returns indexed repository file paths.
+Returns indexed repository file paths. Requires authentication.
 
 **Example response**
 
@@ -396,7 +506,7 @@ Returns indexed repository file paths.
 
 ### `GET /file`
 
-Returns the raw file content, retrieval chunks, and notes for a given path.
+Returns the raw file content, retrieval chunks, and notes for a given path. Requires authentication.
 
 **Example request**
 
@@ -429,7 +539,7 @@ GET /file?path=sample_api.py
 
 ### `POST /upload-zip`
 
-Loads a ZIP archive and indexes supported source files.
+Loads a ZIP archive and indexes supported source files. Requires authentication.
 
 **Example**
 
@@ -451,7 +561,7 @@ curl -X POST http://localhost:8002/upload-zip \
 
 ### `POST /load-git`
 
-Clones a Git repository and indexes supported files.
+Clones a Git repository and indexes supported files. Requires authentication.
 
 **Example**
 
@@ -472,7 +582,7 @@ curl -X POST "http://localhost:8002/load-git?url=https://github.com/example/repo
 
 ### `POST /load-sample`
 
-Loads the bundled sample repository for demos.
+Loads the bundled sample repository for demos. Requires authentication.
 
 **Example response**
 
@@ -487,7 +597,7 @@ Loads the bundled sample repository for demos.
 
 ### `POST /clear`
 
-Clears all in-memory repository state.
+Clears all in-memory repository state. Requires authentication.
 
 **Example response**
 
@@ -499,14 +609,15 @@ Clears all in-memory repository state.
 
 ### `POST /ask`
 
-Asks a repository-level or file-level question.
+Asks a repository-level or file-level question. Requires authentication.
 
 **Example request**
 
 ```json
 {
   "prompt": "What does this file do?",
-  "selected_file": "sample_api.py"
+  "selected_file": "sample_api.py",
+  "scope": "FILE"
 }
 ```
 
@@ -520,16 +631,45 @@ Asks a repository-level or file-level question.
 }
 ```
 
+For repository-wide analysis, set `"scope": "REPOSITORY"` and omit `selected_file`.
+
+### `GET /prompt-templates`
+
+Returns the predefined prompt registry with template metadata, category, description, scope, and output format.
+
+### `POST /prompt-templates/run`
+
+Runs a predefined repository analysis template.
+
+**Example request**
+
+```json
+{
+  "template_id": "architecture_diagram"
+}
+```
+
+### `GET /questions`
+
+Lists tagged questions for the loaded repository. Requires authentication.
+
+Supported query params:
+
+- `scope=ALL`
+- `scope=FILE`
+- `scope=REPOSITORY`
+- `path=<relative/file/path>` for file-level filtering
+
 ### `POST /tag-question`
 
-Stores a file-level note or question.
+Stores a file-level note or question. Requires authentication.
 
 **Example request**
 
 ```json
 {
   "path": "sample_api.py",
-  "username": "Alice",
+  "scope": "FILE",
   "question": "Why is this endpoint here?"
 }
 ```
@@ -540,7 +680,59 @@ Stores a file-level note or question.
 {
   "success": true,
   "file": "sample_api.py",
-  "total_tags": 1
+  "total_tags": 1,
+  "question": {
+    "id": 1,
+    "path": "sample_api.py",
+    "scope": "FILE",
+    "user_id": 2,
+    "username": "alice",
+    "question": "Why is this endpoint here?",
+    "resolved": false,
+    "resolved_at": null,
+    "created_at": "2026-05-16T12:00:00+00:00",
+    "reply_count": 0,
+    "latest_reply_at": null,
+    "replies": []
+  }
+}
+```
+
+### `GET /questions/{id}/replies`
+
+Returns all replies for a tagged question.
+
+### `POST /questions/{id}/reply`
+
+Adds a reply to a tagged question. Requires authentication.
+
+**Example request**
+
+```json
+{
+  "content": "This endpoint exists for the health-check integration."
+}
+```
+
+### `PATCH /questions/{id}/resolve`
+
+Marks a question resolved or unresolved. Requires the question author or an admin.
+
+**Example request**
+
+```json
+{
+  "resolved": true
+}
+```
+
+Repository-scoped questions can be created like this:
+
+```json
+{
+  "path": null,
+  "scope": "REPOSITORY",
+  "question": "How does authentication flow through the whole application?"
 }
 ```
 
@@ -564,18 +756,33 @@ The current AI workflow follows a clear enrichment pipeline:
 ### 3. Context Extraction
 
 - If a file is selected, build prompt context from the full file plus related chunks
-- If no file is selected, retrieve repository-wide matching chunks
+- If repository scope is selected, build context from repository summary, file tree, and top relevant chunks across files
+- If file scope is selected without a file, the API returns a validation error instead of guessing
 
 ### 4. Prompt Enrichment
 
 - Add system instructions for architecture-aware, file-aware answers
-- Combine user prompt and repository context
+- Include scope metadata, file paths, and cross-file snippets when repository scope is active
+- Combine user prompt and retrieved repository context
+- For predefined templates, inject richer analysis instructions from the centralized prompt registry
 
 ### 5. AI Response Generation
 
 - Send enriched messages to an OpenAI-compatible provider
 - Return the generated answer to the frontend
 - Fall back gracefully if the LLM is not configured
+
+### Performance Notes
+
+- Repository files are indexed once when a repo is loaded.
+- Lightweight chunk retrieval is reused for both file and repository scope.
+- Large files are truncated during ingestion to keep context windows stable.
+- Ignored folders include `node_modules`, `.git`, `dist`, `build`, and other generated paths.
+
+### Diagram Support
+
+- Diagram-oriented templates return Mermaid-first prompts so the LLM is nudged toward diagram code blocks.
+- Current support is prompt-driven rather than rendered previews, which keeps the implementation lightweight and easy to extend.
 
 ---
 
@@ -607,6 +814,17 @@ npm run dev
 
 Validate:
 
+- register a new user
+- log in with the admin account
+- confirm the dashboard header shows the logged-in username
+- verify file-scope questions still require a selected file
+- verify repository-scope questions work without a file selected
+- verify repository-wide tags appear under repository discussions
+- verify prompt templates load in the selector
+- verify template apply and template run both work
+- create a tagged question
+- add replies from a logged-in account
+- confirm resolve/unresolve changes the question badge
 - repository loader
 - file explorer
 - file preview
@@ -618,12 +836,19 @@ Validate:
 
 ```bash
 source .venv/bin/activate
-uvicorn main:app --reload --port 8002
+uvicorn backend.app.main:app --reload --port 8002
 ```
 
 Validate:
 
 - startup and imports
+- admin user auto-creation
+- login, logout, and `/auth/me`
+- repository-scope ask requests
+- `GET /questions` scope filtering
+- prompt template listing and execution
+- reply creation and persistence
+- creator/admin-only resolution permissions
 - route registration
 - CORS behavior
 - happy-path API flows
@@ -633,13 +858,20 @@ Validate:
 
 Recommended flow:
 
-1. Load sample repository
-2. Open a file from the explorer
-3. Ask a file-level question
-4. Save a note to the file
-5. Upload a ZIP repository
-6. Load a Git repository
-7. Clear state and verify reset behavior
+1. Start the backend and confirm the admin account is available
+2. Register a new user from the frontend
+3. Log out and log back in
+4. Load the sample repository
+5. Open a file from the explorer
+6. Ask a file-level question
+7. Switch to repository scope and ask an architecture-level question
+8. Run a predefined architecture or security prompt template
+9. Save a file-level note and a repository-level note
+10. Add one or more replies
+11. Mark the question resolved and then unresolved
+12. Upload a ZIP repository
+13. Load a Git repository
+14. Clear state and verify reset behavior
 
 ---
 
@@ -647,8 +879,7 @@ Recommended flow:
 
 To move this from demo-ready to production-grade, the next steps should include:
 
-- authentication and session management
-- database persistence for repository state and notes
+- database persistence for repository state
 - caching for repository analysis and repeated AI calls
 - WebSocket or SSE streaming for long-running AI responses
 - role-based access control (RBAC)
