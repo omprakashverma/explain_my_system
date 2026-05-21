@@ -121,10 +121,22 @@ class PromptTemplateListResponse(BaseModel):
     templates: List[PromptTemplateResponse]
 
 
+class HistoricalAnswerSource(BaseModel):
+    question_id: int
+    question: str
+    username: str
+    created_at: str
+    replies: List[Dict[str, Any]]
+    scope: str
+
+
 class AskResponse(BaseModel):
     answer: str
     found: int
     selected_file: Optional[str]
+    answer_source: str = "llm"  # "llm" or "history"
+    source_question_id: Optional[int] = None
+    related_questions: List[HistoricalAnswerSource] = []
 
 
 class PromptTemplateRunResponse(AskResponse):

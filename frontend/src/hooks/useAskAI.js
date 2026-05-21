@@ -55,7 +55,7 @@ export function useAskAI(setAppError, selectedFile) {
     setAnswer('Thinking...');
     try {
       const response = await aiService.ask(question.trim(), selectedFile, askScope);
-      setAnswer(response.answer);
+      setAnswer(response);
     } catch (error) {
       setAnswer(`Error: ${getErrorMessage(error)}`);
     } finally {
@@ -72,7 +72,7 @@ export function useAskAI(setAppError, selectedFile) {
       const response = await aiService.runPromptTemplate(templateId);
       setAskScope(response.scope || 'REPOSITORY');
       setQuestion(response.template.prompt_template);
-      setAnswer(response.answer);
+      setAnswer(response);
     } catch (error) {
       setAnswer(`Error: ${getErrorMessage(error)}`);
     } finally {

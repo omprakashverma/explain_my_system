@@ -11,6 +11,10 @@ export function AskPanel({
   question,
   selectedFile
 }) {
+  const answerSource = answer?.answer_source || 'llm';
+  const sourceQuestionId = answer?.source_question_id;
+  const relatedQuestions = answer?.related_questions || [];
+
   return (
     <section className="panel">
       <div className="panel-heading">
@@ -70,13 +74,20 @@ export function AskPanel({
         <div className="muted ask-hint">
           {answerLoading
             ? 'Generating answer...'
-            : askScope === 'FILE'
-              ? 'Uses the selected file plus nearby chunks'
-              : 'Uses repository-wide retrieval across relevant files'}
+            : answer
+              ? `Source: ${answerSource === 'history' ? '📚 Team History' : '🤖 AI'}`
+              : askScope === 'FILE'
+                ? 'Uses the selected file plus nearby chunks'
+                : 'Uses repository-wide retrieval across relevant files'}
         </div>
       </div>
 
-      <AnswerRenderer answer={answer} />
+      <AnswerRenderer 
+        answer={answer} 
+        answerSource={answerSource}
+        sourceQuestionId={sourceQuestionId}
+        relatedQuestions={relatedQuestions}
+      />
     </section>
   );
 }

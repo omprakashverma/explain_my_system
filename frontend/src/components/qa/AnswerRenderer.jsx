@@ -482,27 +482,80 @@ function MermaidDiagram({ chart }) {
   );
 }
 
-export function AnswerRenderer({ answer }) {
-  const parsedAnswer = useMemo(() => parseAnswer(answer), [answer]);
-
-  if (parsedAnswer.type === 'mermaid') {
-    return (
-      <div className="answer-stack">
-        <MermaidDiagram chart={parsedAnswer.diagram} />
-        {parsedAnswer.explanation ? (
-          <div className="answer-text-card">
-            <div className="panel-heading compact">
-              <div>
-                <p className="section-kicker">Diagram Notes</p>
-                <h3>Explanation</h3>
-              </div>
-            </div>
-            <pre className="answer-box answer-box-compact">{parsedAnswer.explanation}</pre>
-          </div>
-        ) : null}
-      </div>
-    );
+export function AnswerRenderer({ answer, answerSource = 'llm', sourceQuestionId = null, relatedQuestions = [] }) {
+  if (!answer) {
+    return null;
   }
 
-  return <pre className="answer-box">{parsedAnswer.text}</pre>;
+  const answerText = answer?.answer || answer;
+  const parsedAnswer = useMemo(() => parseAnswer(answerText), [answerText]);
+
+  const sourceIndicator = answerSource === 'history' 
+    ? { label: '📚 From Team History', className: 'source-history' }
+    : { label: '🤖 From AI', className: 'source-llm' };
+
+  return (
+    <div className="answer-stack">
+      {/* Source Badge */}
+      <div className={`source-badge ${sourceIndicator.className}`}>
+        <span>{sourceIndicator.label}</span>
+        {sourceQuestionId && (
+          <span className="source-id">Question #{sourceQuestionId}</span>
+        )}
+      </div>
+
+      {/* Main Answer */}
+      {parsedAnswer.type === 'mermaid' ? (
+        <>
+          <MermaidDiagram chart={parsedAnswer.diagram} />
+          {parsedAnswer.explanation ? (
+            <div className="answer-text-card">
+              <div className="panel-heading compact">
+                <div>
+                  <p className="section-kicker">Diagram Notes</p>
+                  <h3>Explanation</h3>
+                </div>
+              </div>
+              <pre className="answer-box answer-box-compact">{parsedAnswer.explanation}</pre>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <pre className="answer-box">{parsedAnswer.text}</pre>
+      )}
+
+      {/* Related Questions */}
+      {relatedQuestions && relatedQuestions.length > 0 && (
+        <div className="related-questions-section">
+          <div className="panel-heading compact">
+            <p className="section-kicker">Related Discussions</p>
+            <h3>Other team members asked similar questions</h3>
+          </div>
+          <div className="related-questions-list">
+            {relatedQuestions.map((q) => (
+              <div key={q.question_id} className="related-question-item">
+                <div className="question-header">
+                  <p className="question-text">{q.question}</p>
+                  <span className="question-meta">
+                    <span className="author">{q.username}</span>
+                    <span className="date">{new Date(q.created_at).toLocaleDateString()}</span>
+                  </span>
+                </div>
+                {q.replies && q.replies.length > 0 && (
+                  <div className="question-replies">
+                    {q.replies.map((reply, idx) => (
+                      <div key={reply.id || idx} className="reply-item">
+                        <span className="reply-author">{reply.username}:</span>
+                        <span className="reply-content">{reply.content}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
