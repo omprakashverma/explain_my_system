@@ -10,7 +10,7 @@ load_dotenv(BASE_DIR / ".env")
 
 
 class Settings(BaseModel):
-    app_title: str = "Explain My System"
+    app_title: str = "CodeAtlas"
     llm_api_url: str = "https://api.groq.com/openai/v1/chat/completions"
     llm_api_key: str = "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"
     llm_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"

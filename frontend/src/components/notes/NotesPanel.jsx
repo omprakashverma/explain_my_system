@@ -21,7 +21,9 @@ export function NotesPanel({
   questionScope,
   replyDrafts,
   selectedFile,
+  teamName,
   taggedQuestions,
+  onTeamNameChange,
   username
 }) {
   return (
@@ -64,6 +66,14 @@ export function NotesPanel({
         }
         value={fileQuestion}
         onChange={(event) => onFileQuestionChange(event.target.value)}
+      />
+
+      <input
+        className="text-input"
+        type="text"
+        placeholder="Optional team name, for example Platform or QA"
+        value={teamName}
+        onChange={(event) => onTeamNameChange(event.target.value)}
       />
 
       <div className="button-row">
@@ -138,6 +148,7 @@ export function NotesPanel({
                         {item.resolved ? 'Resolved' : 'Open'}
                       </span>
                       <span className="chip subtle">{scopeLabel(item.scope)}</span>
+                      {item.team_name ? <span className="chip subtle">Team: {item.team_name}</span> : null}
                       <span className="chip subtle">{item.reply_count} replies</span>
                     </div>
                     <h3 className="discussion-author">{item.username}</h3>
@@ -189,7 +200,7 @@ export function NotesPanel({
                   />
                   <div className="button-row">
                     <button
-                      className="btn secondary"
+                      className="btn primary"
                       type="button"
                       onClick={() => onSubmitReply(item.id)}
                       disabled={isBusy || !(replyDrafts[item.id] || '').trim()}

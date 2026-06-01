@@ -29,6 +29,7 @@ class QuestionResponse(BaseModel):
     id: int
     path: Optional[str]
     scope: str
+    team_name: Optional[str]
     user_id: int
     username: str
     question: str

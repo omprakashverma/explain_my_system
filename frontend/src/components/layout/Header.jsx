@@ -7,18 +7,6 @@ export function Header({ busyMessage, onLogout, summary, user }) {
       <div>
         <div className="hero-topbar">
           <p className="hero-kicker">CodeAtlas</p>
-
-          <div className="auth-badge-row">
-            <span className="chip">Signed in as {user?.username}</span>
-
-            <button
-              className="btn ghost"
-              type="button"
-              onClick={onLogout}
-            >
-              Logout
-            </button>
-          </div>
         </div>
 
         <h1>Collaborative intelligence for codebases</h1>

@@ -23,6 +23,7 @@ class LoginRequest(BaseModel):
 class FileQuestionTag(BaseModel):
     path: Optional[str] = None
     scope: str = QuestionScope.FILE
+    team_name: Optional[str] = None
     question: str
 
 

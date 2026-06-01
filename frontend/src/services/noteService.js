@@ -1,11 +1,12 @@
 import { apiClient } from './apiClient';
 
 export const noteService = {
-  async listQuestions(path, scope) {
+  async listQuestions(path, scope, teamName) {
     const response = await apiClient.get('/questions', {
       params: {
         path: path || undefined,
-        scope
+        scope,
+        team_name: teamName || undefined
       }
     });
     return response.data;

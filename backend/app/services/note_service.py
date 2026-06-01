@@ -36,6 +36,7 @@ class NoteService:
             "id": int(question["id"]),
             "path": str(question["path"]) if question.get("path") else None,
             "scope": str(question.get("scope") or QuestionScope.FILE),
+            "team_name": str(question["team_name"]) if question.get("team_name") else None,
             "user_id": int(question["user_id"]),
             "username": str(question["username"]),
             "question": str(question["question"]),
@@ -52,9 +53,10 @@ class NoteService:
         repository_key: str,
         path: str | None = None,
         scope: str = QuestionScope.ALL,
+        team_name: str | None = None,
     ) -> List[Dict[str, Any]]:
         normalized_scope = self._validate_scope(scope)
-        questions = self.store.list_questions(repository_key, path, normalized_scope)
+        questions = self.store.list_questions(repository_key, path, normalized_scope, self._normalize_team_name(team_name))
         return [self._hydrate_question(question) for question in questions]
 
     def add_question(
@@ -64,15 +66,18 @@ class NoteService:
         scope: str,
         current_user: Dict[str, Any],
         question: str,
+        team_name: str | None = None,
     ) -> Dict[str, Any]:
         normalized_scope = self._validate_scope(scope, allow_all=False)
         normalized_path = path if normalized_scope == QuestionScope.FILE else ""
         if normalized_scope == QuestionScope.FILE and not normalized_path:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "A file question requires a selected file.")
+        normalized_team_name = self._normalize_team_name(team_name)
         saved_question = self.store.create_question(
             repository_key=repository_key,
             path=normalized_path,
             scope=normalized_scope,
+            team_name=normalized_team_name,
             user_id=int(current_user["id"]),
             username=str(current_user["username"]),
             question=self._validate_question_text(question),
@@ -81,9 +86,21 @@ class NoteService:
         return {
             "success": True,
             "file": normalized_path,
-            "total_tags": len(self.store.list_questions(repository_key, normalized_path, normalized_scope)),
+            "total_tags": len(
+                self.store.list_questions(repository_key, normalized_path, normalized_scope, normalized_team_name)
+            ),
             "question": self._hydrate_question(saved_question),
         }
+
+    def _normalize_team_name(self, team_name: str | None) -> str | None:
+        if team_name is None:
+            return None
+        value = team_name.strip()
+        if not value:
+            return None
+        if len(value) > 120:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Team name must be 120 characters or fewer.")
+        return value
 
     def _validate_scope(self, scope: str, allow_all: bool = True) -> str:
         normalized = (scope or "").upper()

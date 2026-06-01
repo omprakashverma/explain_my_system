@@ -45,7 +45,7 @@ export function AuthPage() {
     <main className="auth-shell">
       <section className="auth-card">
         <div className="auth-copy">
-          <p className="hero-kicker">Explain My System</p>
+          <p className="hero-kicker">CodeAtlas</p>
           <h1>Secure access for repository analysis</h1>
           <p className="hero-copy">
             Sign in to explore repositories, ask architecture questions, and attach notes to files

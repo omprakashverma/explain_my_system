@@ -20,6 +20,7 @@ router = APIRouter()
 async def list_questions(
     path: str | None = Query(default=None),
     scope: str = Query(default=QuestionScope.ALL),
+    team_name: str | None = Query(default=None),
     current_user: dict[str, object] = Depends(require_current_user),
 ) -> dict[str, object]:
     del current_user
@@ -28,6 +29,7 @@ async def list_questions(
             repository_store.get_repository_key(),
             path=path,
             scope=scope,
+            team_name=team_name,
         )
     }
 
@@ -44,6 +46,7 @@ async def tag_question(req: FileQuestionTag, current_user: dict[str, object] = D
         normalized_scope,
         current_user,
         req.question,
+        req.team_name,
     )
 
 

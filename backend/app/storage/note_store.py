@@ -27,6 +27,7 @@ class NoteStore:
                     repository_key TEXT NOT NULL,
                     path TEXT,
                     scope TEXT NOT NULL DEFAULT 'FILE',
+                    team_name TEXT,
                     user_id INTEGER NOT NULL,
                     username TEXT NOT NULL,
                     question TEXT NOT NULL,
@@ -39,6 +40,8 @@ class NoteStore:
             columns = {row["name"] for row in connection.execute("PRAGMA table_info(questions)").fetchall()}
             if "scope" not in columns:
                 connection.execute("ALTER TABLE questions ADD COLUMN scope TEXT NOT NULL DEFAULT 'FILE'")
+            if "team_name" not in columns:
+                connection.execute("ALTER TABLE questions ADD COLUMN team_name TEXT")
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS replies (
@@ -68,6 +71,7 @@ class NoteStore:
         repository_key: str,
         path: str | None,
         scope: str,
+        team_name: str | None,
         user_id: int,
         username: str,
         question: str,
@@ -76,10 +80,10 @@ class NoteStore:
         with self._connect() as connection:
             cursor = connection.execute(
                 """
-                INSERT INTO questions (repository_key, path, scope, user_id, username, question, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO questions (repository_key, path, scope, team_name, user_id, username, question, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (repository_key, path, scope, user_id, username, question, created_at),
+                (repository_key, path, scope, team_name, user_id, username, question, created_at),
             )
             connection.commit()
             question_id = int(cursor.lastrowid)
@@ -90,7 +94,7 @@ class NoteStore:
         with self._connect() as connection:
             row = connection.execute(
                 """
-                SELECT id, repository_key, path, scope, user_id, username, question, resolved, resolved_at, created_at
+                SELECT id, repository_key, path, scope, team_name, user_id, username, question, resolved, resolved_at, created_at
                 FROM questions
                 WHERE id = ?
                 """,
@@ -102,9 +106,15 @@ class NoteStore:
         payload["resolved"] = bool(payload["resolved"])
         return payload
 
-    def list_questions(self, repository_key: str, path: str | None = None, scope: str = QuestionScope.ALL) -> List[Dict[str, Any]]:
+    def list_questions(
+        self,
+        repository_key: str,
+        path: str | None = None,
+        scope: str = QuestionScope.ALL,
+        team_name: str | None = None,
+    ) -> List[Dict[str, Any]]:
         query = """
-            SELECT id, repository_key, path, scope, user_id, username, question, resolved, resolved_at, created_at
+            SELECT id, repository_key, path, scope, team_name, user_id, username, question, resolved, resolved_at, created_at
             FROM questions
             WHERE repository_key = ?
         """
@@ -121,6 +131,9 @@ class NoteStore:
         elif path is not None:
             query += " AND (scope = ? OR (scope = ? AND path = ?))"
             params.extend([QuestionScope.REPOSITORY, QuestionScope.FILE, path])
+        if team_name is not None:
+            query += " AND team_name = ?"
+            params.append(team_name)
         query += " ORDER BY created_at DESC, id DESC"
         with self._connect() as connection:
             rows = connection.execute(query, tuple(params)).fetchall()

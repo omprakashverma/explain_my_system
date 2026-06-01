@@ -13,6 +13,7 @@ export function useNotes(
   repositoryKey
 ) {
   const [fileQuestion, setFileQuestion] = useState('');
+  const [teamName, setTeamName] = useState('');
   const [questionScope, setQuestionScope] = useState('FILE');
   const [discussionFilter, setDiscussionFilter] = useState('ALL');
   const [replyDrafts, setReplyDrafts] = useState({});
@@ -23,10 +24,7 @@ export function useNotes(
       return;
     }
     try {
-      const response = await noteService.listQuestions(
-        scope === 'FILE' ? selectedFile : selectedFile || null,
-        scope
-      );
+      const response = await noteService.listQuestions(scope === 'FILE' ? selectedFile : selectedFile || null, scope);
       setTaggedQuestions(response.questions || []);
     } catch (error) {
       setAppError(getErrorMessage(error));
@@ -54,9 +52,11 @@ export function useNotes(
       await noteService.saveQuestion({
         path: questionScope === 'FILE' ? selectedFile : null,
         question: fileQuestion.trim(),
-        scope: questionScope
+        scope: questionScope,
+        team_name: teamName.trim() || null
       });
       setFileQuestion('');
+      setTeamName('');
       if (selectedFile) {
         await openFile(selectedFile, getHighlightedLine());
       }
@@ -105,8 +105,10 @@ export function useNotes(
     replyDrafts,
     setDiscussionFilter,
     setFileQuestion,
+    setTeamName,
     setQuestionScope,
     submitReply,
+    teamName,
     tagQuestionToFile,
     toggleResolved,
     updateReplyDraft

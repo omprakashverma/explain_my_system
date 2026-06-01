@@ -141,9 +141,11 @@ export function DashboardPage() {
             onResolveToggle={notes.toggleResolved}
             onSaveQuestion={notes.tagQuestionToFile}
             onSubmitReply={notes.submitReply}
+            onTeamNameChange={notes.setTeamName}
             questionScope={notes.questionScope}
             replyDrafts={notes.replyDrafts}
             selectedFile={preview.selectedFile}
+            teamName={notes.teamName}
             taggedQuestions={preview.taggedQuestions}
             username={auth.user?.username || ''}
           />

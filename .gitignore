@@ -1,0 +1,363 @@
+# ==============================================
+# PYTHON
+# ==============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ==============================================
+# NODE.JS / FRONTEND
+# ==============================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+.node_gyp/
+*.gypsum
+build/Release
+
+# Dependency directories
+node_modules/
+
+# TypeScript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env
+.env.local
+.env.*.local
+
+# Mac files
+.DS_Store
+
+# Yarn
+yarn-error.log
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ==============================================
+# IDE & EDITOR
+# ==============================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# WebStorm
+.idea/
+*.iml
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+.vim/
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Atom
+.atom/
+.atomignore
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+.idea_modules/
+
+# Eclipse
+.classpath
+.project
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# ==============================================
+# OS
+# ==============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ==============================================
+# BUILD & DIST
+# ==============================================
+
+dist/
+build/
+*.egg-info/
+.venv/
+venv/
+*.whl
+
+# ==============================================
+# LOGS & TEMP
+# ==============================================
+
+*.log
+*.swp
+*.swo
+*~
+.tmp/
+temp/
+tmp/
+
+# ==============================================
+# DATABASE
+# ==============================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.sql
+
+# ==============================================
+# SECRETS & CREDENTIALS
+# ==============================================
+
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+secrets.json
+credentials.json
+.aws/
+.gcloud/
+
+# ==============================================
+# FRONTEND BUILD
+# ==============================================
+
+dist/
+build/
+*.bundle.js
+*.bundle.css
+.parcel-cache/
+.cache/
+
+# ==============================================
+# SPECIFIC PROJECT ARTIFACTS
+# ==============================================
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Auth database (shouldn't be committed)
+backend/storage/auth.db
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# ==============================================
+# OPTIONAL: KEEP THESE IF NEEDED
+# ==============================================
+
+# If you want to allow certain files even with above rules, use !
+# Example:
+# !.vscode/settings.json
+# !.env.example
